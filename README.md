@@ -23,7 +23,6 @@ Featured in the [AR12Gaming](https://discord.gg/ar12) server and the biggest aut
 3. You go to `Server Settings -> Integrations -> Bot and Apps -> Click 'Manage' on ThrottleBot Verification -> Command Permissions` to whitelist or blacklist certain members or channels.
 4. Everything's setup! You can now test it out by using the `/verify` command and make sure everything is working as intented.
 5. You can join our [support server](https://discord.gg/Nh4A6HDZT4) if you need help with anything.
-6. Our Trello board can be found here: [ThrottleBot Verification Trello](https://trello.com/b/VkCeRfrR)
 
 > :exclamation:  **Please make sure that the bot has access to view and send messages in the channel you use the slash commands if it appears to be unresponsive.**
 
