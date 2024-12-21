@@ -1,6 +1,6 @@
 const { obtainGuildProfile } = require('../modules/database.js');
 const { guildJoinLogChannelId, botIcon } = require('../modules/utility.js');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 const guildProfileSchema = require('../mongodb_schema/guildProfileSchema.js');
 const moment = require('moment');
@@ -28,7 +28,7 @@ module.exports = {
 			async function createGuildProfile(){
 				//Creates the guild profile with required data points.
 				const serverProfileDocument = new guildProfileSchema({
-					_id: mongoose.Types.ObjectId(),
+					_id: new mongoose.Types.ObjectId(),
 					guildId: guildId,
 					guideChannelId: null,
 					verificationChannelId: null,
@@ -46,27 +46,27 @@ module.exports = {
 			};
 			await createGuildProfile();
 		};
-		const guildJoinLogEmbed = new MessageEmbed()
+		const guildJoinLogEmbed = new EmbedBuilder()
 		.setTitle(guildName)
 		.setThumbnail(guildIcon)
 		.setDescription(`The bot was added to a new server! Now serving a total of **${totalGuilds.toLocaleString()} servers** with \`${totalMembers.toLocaleString()} members\`\nDown below are the details of the server.`)
-		.addField('Name', guildName, true)
-		.addField('Server Id', guildId, true)
-		.addField('Owner', `<@${guildOwnerId}> | ${guildOwnerId}`, true)
-		.addField('Member Count', `${guildMemberCount.toLocaleString()} Members`, true)
+		.addFields({name: 'Name', value: guildName, inline: true})
+		.addFields({name: 'Server Id', value: guildId, inline: true})
+		.addFields({name: 'Owner', value: `<@${guildOwnerId}> | ${guildOwnerId}`, inline: true})
+		.addFields({name: 'Member Count', value: `${guildMemberCount.toLocaleString()} Members`, inline: true})
 		.setColor('#FFFCFF')
 		.setTimestamp()
 		.setFooter({
 			text: 'ThrottleBot Vehicle Verification',
 			iconURL: botIcon
 		})
-		await guild.channels.cache.find(r => r.type !== 'GUILD_CATEGORY')
+		await guild.channels.cache.find(channel => channel.name === 'general')
         .createInvite({
 			maxAge: 0,
 			maxUses: 0 
 		})
-        .then((invite) => guildJoinLogEmbed.addField("Invite link", invite.url, true))
-        .catch(() => guildJoinLogEmbed.addField("Invite link", "Missing permissions", true));
+        .then((invite) => guildJoinLogEmbed.addFields({name: "Invite link", value: invite.url, inline: true}))
+        .catch(() => guildJoinLogEmbed.addFields({name: "Invite link", value: "Missing permissions", inline: true}));
 		guildJoinLogChannel.send({
 			embeds: [guildJoinLogEmbed]
 		});

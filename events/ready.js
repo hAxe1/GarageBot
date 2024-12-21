@@ -7,7 +7,7 @@ module.exports = {
 	once: true,
 	execute(client) {
 		console.log(`Ready! Logged in as ${client.user.tag}`);
-        mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+        mongoose.connect(mongoURI)
         .then(result => console.log('MongoDB connection established.'))
         .catch(e => console.log(`MongoDB connection failed.\nErr: ${e}`));
 	},

@@ -1,7 +1,7 @@
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js')
+const { EmbedBuilder, MessageActionRow, MessageButton } = require('discord.js')
 
-const guildJoinLogChannelId = '974705965653979227';
-const guildLeaveLogChannelId = '974705992698822727';
+const guildJoinLogChannelId = '1319908356269281330';
+const guildLeaveLogChannelId = '1319908356269281330';
 const embedColor = '#FFFCFF';
 const botIcon = 'https://cdn.discordapp.com/attachments/975485952325726278/975485974710714458/ThrottleBotLogo.png';
 const botName = 'ThrottleBot Verification';
@@ -22,14 +22,14 @@ const botInviteAdmin = 'https://discord.com/api/oauth2/authorize?client_id=85141
 const supportServerInvite = 'https://discord.gg/Nh4A6HDZT4'
 const githubLink = 'https://github.com/davidxdeveloper/throttlebot-verification/'
 const ownerAvatar = 'https://cdn.discordapp.com/avatars/378171973429231616/a_a1790dd0cba3c69e26d515b531385e1e.gif?size=4096';
-const ownerTag = 'Davidddddddd#7076';
-const patreonT1 = '982011560794923038';
-const patreonT2 = '982012168482455582';
-const patreonT3 = '982012171569463317';
-const patreonT4 = '982012172269924483';
-const patreonDefault = '982012172483829893';
-const supportServerId = '851413403222147073';
-const botId = '851411747641884712';
+const ownerTag = '_hAxel';
+const patreonT1 = '1319908356269281330';
+const patreonT2 = '1319908356269281330';
+const patreonT3 = '1319908356269281330';
+const patreonT4 = '1319908356269281330';
+const patreonDefault = '1319908356269281330';
+const supportServerId = '1254871223985504326';
+const botId = '1319140275985317950';
 
 function removeNonIntegers(string){
     return string.replace(/\D/g,'');
@@ -41,7 +41,7 @@ function capitalizeFirstLetter(string) {
 
 function errorEmbed(errMsg, useravatar = null, example = null, embedColor = '#ff6961', footerIcon = null, footerText = null){
     //A predefined error embed to use in case there's an error scenario.
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
     .setColor(embedColor)
     .setAuthor(
         {
@@ -57,7 +57,7 @@ function errorEmbed(errMsg, useravatar = null, example = null, embedColor = '#ff
 };
 
 function tipsEmbed(tipMsg, embedColor = '#FFFCFF'){
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
     .setColor(embedColor)
     .setAuthor(
         {
@@ -82,7 +82,7 @@ function isValidHttpUrl(string) {
 };
 
 function patreonAdvertEmbed(avatar, title, description, footerIcon, footerText){
-    const patreonAdvertisementEmbed = new MessageEmbed()
+    const patreonAdvertisementEmbed = new EmbedBuilder()
     .setAuthor({
         name: title,
         iconURL: avatar

@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
-const { botInvite, botInviteAdmin, ownerAvatar, ownerTag} = require('../modules/utility.js');
+const { botInvite, botInviteAdmin, ownerAvatar, ownerTag} = require('../../modules/utility.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()

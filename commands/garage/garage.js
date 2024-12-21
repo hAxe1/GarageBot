@@ -1,7 +1,7 @@
 const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { obtainGuildProfile, defaultEmbedColor, obtainAllUserVehicles, obtainUserProfile } = require('../modules/database.js');
-const {  errorEmbed, removeNonIntegers, tipsEmbed, patreonAdvertEmbed } = require('../modules/utility.js');
+const { obtainGuildProfile, defaultEmbedColor, obtainAllUserVehicles, obtainUserProfile } = require('../../modules/database.js');
+const {  errorEmbed, removeNonIntegers, tipsEmbed, patreonAdvertEmbed } = require('../../modules/utility.js');
 const Chance = require('chance');
 const chance = new Chance();
 

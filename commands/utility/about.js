@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed, MessageActionRow, MessageButton, Message } = require('discord.js');
-const { botInvite, supportServerInvite, githubLink, ownerTag, ownerAvatar, patreonLink} = require('../modules/utility.js');
-const garageSchema = require('../mongodb_schema/garageSchema.js');
-const garage = require('./garage.js');
+const { botInvite, supportServerInvite, githubLink, ownerTag, ownerAvatar, patreonLink} = require('../../modules/utility.js');
+const garageSchema = require('../../mongodb_schema/garageSchema.js');
+const garage = require('../garage/garage.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()

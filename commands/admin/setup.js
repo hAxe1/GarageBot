@@ -1,8 +1,8 @@
-const { MessageEmbed, MessageActionRow,Modal ,MessageSelectMenu, MessageButton } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, Modal , StringSelectMenuBuilder, MessageButton } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { obtainGuildProfile, defaultEmbedColor } = require('../modules/database.js');
-const guildProfileSchema = require('../mongodb_schema/guildProfileSchema.js');
-const { botIcon, greenColor, errorEmbed, removeNonIntegers, isValidHttpUrl, ownerTag } = require('../modules/utility.js');
+const { obtainGuildProfile, defaultEmbedColor } = require('../../modules/database.js');
+const guildProfileSchema = require('../../mongodb_schema/guildProfileSchema.js');
+const { botIcon, greenColor, errorEmbed, removeNonIntegers, isValidHttpUrl, ownerTag } = require('../../modules/utility.js');
 const { url } = require('node:inspector');
 const wait = require('node:timers/promises').setTimeout;
 module.exports = {
@@ -16,7 +16,7 @@ module.exports = {
 		const initiatorUsername = interaction.user.username;
 		const initiatorAvatar = interaction.user.displayAvatarURL({ dynamic: true });
 		const initiatorPermissions = interaction.memberPermissions.toArray();
-		if(!initiatorPermissions.includes('MANAGE_GUILD')){
+		if(!initiatorPermissions.includes('ManageGuild')){
 			interaction.editReply({
 				embeds: [errorEmbed('You do not have authorization to use this command. (Manage Server permission is required)', initiatorAvatar)]
 			});
@@ -51,7 +51,7 @@ module.exports = {
 			const buttonFilter = (ButtonInteraction) => ButtonInteraction.componentType === 'BUTTON' && ButtonInteraction.user.id === initiatorId && (ButtonInteraction.customId === 'goBack' || ButtonInteraction.customId === 'exit');
 			const menuFilter = (menuInteraction) => menuInteraction.componentType === 'SELECT_MENU' && menuInteraction.customId === 'select' && menuInteraction.user.id === initiatorId;
 
-			const setupEmbed = new MessageEmbed()
+			const setupEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: 'Server Setup',
 				iconURL: initiatorAvatar
@@ -63,41 +63,41 @@ module.exports = {
 				iconURL: footerIcon
 			});
 			if(verificationChannelId){
-				setupEmbed.addField(`Verification Channel`, `<#${verificationChannelId}>`, true);
+				setupEmbed.addFields({name: `Verification Channel`, value: `<#${verificationChannelId}>`, inline: true});
 			}else{
-				setupEmbed.addField(`Verification Channel`, `Not setup.`, true);
+				setupEmbed.addFields({name: `Verification Channel`, value: `Not setup.`, inline: true});
 			};
 			if(guideChannelId){
-				setupEmbed.addField(`Guide Channel`, `<#${guideChannelId}>`, true);
+				setupEmbed.addFields({name: `Guide Channel`, value: `<#${guideChannelId}>`, inline: true});
 			}else{
-				setupEmbed.addField(`Guide Channel`, `Not setup.`, true);
+				setupEmbed.addFields({name: `Guide Channel`, value: `Not setup.`, inline: true});
 			};
 			if(loggingChannelId){
-				setupEmbed.addField(`Logging Channel`, `<#${loggingChannelId}>`, true);
+				setupEmbed.addFields({name: `Logging Channel`, value: `<#${loggingChannelId}>`, inline: true});
 			}else{
-				setupEmbed.addField(`Logging Channel`, `Not setup.`, true);
+				setupEmbed.addFields({name: `Logging Channel`, value: `Not setup.`, inline: true});
 			};
 			if(verificationRoleId){
-				setupEmbed.addField(`Verified Role`, `<@&${verificationRoleId}>`, true);
+				setupEmbed.addFields({name: `Verified Role`, value: `<@&${verificationRoleId}>`, inline: true});
 			}else{
-				setupEmbed.addField(`Verified Role`, `Not setup.`, true);
+				setupEmbed.addFields({name: `Verified Role`, value: `Not setup.`, inline: true});
 
 			};
 			if(syncEnabled){
-				setupEmbed.addField(`Sync Status`, `Synced to Id: ${syncedGuildId}`, true);
+				setupEmbed.addFields({name: `Sync Status`, value: `Synced to Id: ${syncedGuildId}`, inline: true});
 			}else{
-				setupEmbed.addField(`Sync Status`, `Not synced.`, true);
+				setupEmbed.addFields({name: `Sync Status`, value: `Not synced.`, inline: true});
 			};
 			if(footerIcon){
-				setupEmbed.addField(`Custom Embed Icon`, `[Icon Link](${footerIcon})`, true);
+				setupEmbed.addFields({name: `Custom Embed Icon`, value: `[Icon Link](${footerIcon})`, inline: true});
 			}else{
 				footerIcon = guildIcon;
-				setupEmbed.addField(`Custom Embed Icon`, `[Default](${footerIcon})`, true);
+				setupEmbed.addFields({name: `Custom Embed Icon`, value: `[Default](${footerIcon})`, inline: true});
 			};
 				
-			const row = new MessageActionRow()
+			const row = new ActionRowBuilder()
 			.addComponents(
-				new MessageSelectMenu()
+				new StringSelectMenuBuilder()
 					.setCustomId('select')
 					.setPlaceholder('Select the option you wish to configure...')
 					.addOptions([
@@ -151,6 +151,7 @@ module.exports = {
 				const optionId = collected.values[0];
 				switch(optionId){
 					case "first_option":
+						console.log('First Option');
 						async function setVerificationChannel(){
 							if(!collected.deferred) await collected.deferUpdate();
 							const verificationChannelEmbed = new MessageEmbed()
@@ -172,7 +173,7 @@ module.exports = {
 							.setCustomId('exit')
 							.setLabel('Exit')
 							.setStyle('DANGER');
-							const row = new MessageActionRow()
+							const row = new ActionRowBuilder()
 							.addComponents(goBackButton)
 							.addComponents(exitButton)
 							interaction.editReply({
@@ -291,7 +292,7 @@ module.exports = {
 							.setCustomId('exit')
 							.setLabel('Exit')
 							.setStyle('DANGER');
-							const row = new MessageActionRow()
+							const row = new ActionRowBuilder()
 							.addComponents(goBackButton)
 							.addComponents(exitButton)
 							interaction.editReply({
@@ -425,7 +426,7 @@ module.exports = {
 							.setCustomId('exit')
 							.setLabel('Exit')
 							.setStyle('DANGER');
-							const row = new MessageActionRow()
+							const row = new ActionRowBuilder()
 							.addComponents(goBackButton)
 							.addComponents(exitButton)
 							interaction.editReply({
@@ -542,7 +543,7 @@ module.exports = {
 							.setCustomId('exit')
 							.setLabel('Exit')
 							.setStyle('DANGER');
-							const row = new MessageActionRow()
+							const row = new ActionRowBuilder()
 							.addComponents(goBackButton)
 							.addComponents(exitButton)
 							interaction.editReply({
