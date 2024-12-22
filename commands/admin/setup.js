@@ -1,4 +1,4 @@
-const { EmbedBuilder, ActionRowBuilder, Modal , StringSelectMenuBuilder, MessageButton } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, Modal , StringSelectMenuBuilder, ButtonBuilder, ComponentType } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { obtainGuildProfile, defaultEmbedColor } = require('../../modules/database.js');
 const guildProfileSchema = require('../../mongodb_schema/guildProfileSchema.js');
@@ -48,8 +48,8 @@ module.exports = {
 			const embedColor = await defaultEmbedColor(initiatorId);
 			//Filters
 			const messageFilter = (m) => m.author.id === initiatorId;
-			const buttonFilter = (ButtonInteraction) => ButtonInteraction.componentType === 'BUTTON' && ButtonInteraction.user.id === initiatorId && (ButtonInteraction.customId === 'goBack' || ButtonInteraction.customId === 'exit');
-			const menuFilter = (menuInteraction) => menuInteraction.componentType === 'SELECT_MENU' && menuInteraction.customId === 'select' && menuInteraction.user.id === initiatorId;
+			const buttonFilter = (ButtonInteraction) => ButtonInteraction.componentType === 2 && ButtonInteraction.user.id === initiatorId && (ButtonInteraction.customId === 'goBack' || ButtonInteraction.customId === 'exit');
+			const menuFilter = (menuInteraction) => menuInteraction.componentType === 3 && menuInteraction.customId === 'select' && menuInteraction.user.id === initiatorId;
 
 			const setupEmbed = new EmbedBuilder()
 			.setAuthor({
@@ -154,7 +154,7 @@ module.exports = {
 						console.log('First Option');
 						async function setVerificationChannel(){
 							if(!collected.deferred) await collected.deferUpdate();
-							const verificationChannelEmbed = new MessageEmbed()
+							const verificationChannelEmbed = new EmbedBuilder()
 							.setAuthor({
 								name: 'Server Setup - Setting The Verification Channel',
 								iconURL: initiatorAvatar
@@ -165,14 +165,14 @@ module.exports = {
 								text: footerText,
 								iconURL: footerIcon
 							});
-							const goBackButton = new MessageButton()
+							const goBackButton = new ButtonBuilder()
 							.setCustomId('goBack')
 							.setLabel('Go Back')
-							.setStyle('SECONDARY');
-							const exitButton = new MessageButton()
+							.setStyle('Secondary');
+							const exitButton = new ButtonBuilder()
 							.setCustomId('exit')
 							.setLabel('Exit')
-							.setStyle('DANGER');
+							.setStyle('Danger');
 							const row = new ActionRowBuilder()
 							.addComponents(goBackButton)
 							.addComponents(exitButton)
@@ -222,15 +222,15 @@ module.exports = {
 									await wait(5000);
 									return serverSetup();
 								};
-								const botPermissionsIn = interaction.guild.me.permissionsIn(providedChannel).serialize();
-								const { VIEW_CHANNEL, SEND_MESSAGES, EMBED_LINKS, ATTACH_FILES, READ_MESSAGE_HISTORY } = botPermissionsIn;
-								const permissionsArray = [VIEW_CHANNEL, SEND_MESSAGES, EMBED_LINKS, ATTACH_FILES, READ_MESSAGE_HISTORY];
+								const botPermissionsIn = interaction.guild.members.me.permissionsIn(providedChannel).serialize();
+								const { ViewChannel, SendMessages, EmbedLinks, AttachFiles, ReadMessageHistory } = botPermissionsIn;
+								const permissionsArray = [ViewChannel, SendMessages, EmbedLinks, AttachFiles, ReadMessageHistory];
 								//Checking if the bot has all the required permissions in the channel being assigned for verification
 								const validation = permissionsArray.every(Boolean);
 								if(!validation){
 									//Error if required permissions are not present.
 									interaction.editReply({
-										embeds: [errorEmbed(`Missing required permissions.\nPlease make sure i have the following permissions on my role and in channel permissions:\n\`${['VIEW_CHANNEL', 'SEND_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'READ_MESSAGE_HISTORY', 'MANAGE_ROLES'].join('\n')}\`\n\nRun the \`/setup\` command once the permissions have been fixed.`, initiatorAvatar)],
+										embeds: [errorEmbed(`Missing required permissions.\nPlease make sure i have the following permissions on my role and in channel permissions:\n\`${['ViewChannel', 'SendMessages', 'EmbedLinks', 'AttachFiles', 'ReadMessageHistory', 'MANAGE_ROLES'].join('\n')}\`\n\nRun the \`/setup\` command once the permissions have been fixed.`, initiatorAvatar)],
 										components: []
 									});
 									await wait(5000);
@@ -246,13 +246,13 @@ module.exports = {
 									})
 									return;
 								});
-								const confirmationEmbed = new MessageEmbed()
+								const confirmationEmbed = new EmbedBuilder()
 								.setAuthor({
 									name: 'Server Setup - Verification Channel Configured',
 									iconURL: initiatorAvatar
 								})
 								.setDescription(`The verification channel has been set as <#${providedChannel.id}>\nWhen a user applies for verification, the application will be sent in there.\n\nGoing back to main menu in 10 seconds...`)
-								.addField('Note','Please make sure that this channel is to be kept private and accessible to only those who will manage verifications in your server.')
+								.addFields({name:'Note', value:'Please make sure that this channel is to be kept private and accessible to only those who will manage verifications in your server.', inline: false})
 								.setColor(greenColor)
 								.setFooter({
 									text: footerText,
@@ -273,7 +273,7 @@ module.exports = {
 					case "second_option":
 						async function setGuideChannel(){
 							if(!collected.deferred) await collected.deferUpdate();
-							const guideChannelEmbed = new MessageEmbed()
+							const guideChannelEmbed = new EmbedBuilder()
 							.setAuthor({
 								name: 'Server Setup - Setting The Guide Channel',
 								iconURL: initiatorAvatar
@@ -284,14 +284,14 @@ module.exports = {
 								text: footerText,
 								iconURL: footerIcon
 							});
-							const goBackButton = new MessageButton()
+							const goBackButton = new ButtonBuilder()
 							.setCustomId('goBack')
 							.setLabel('Go Back')
-							.setStyle('SECONDARY');
-							const exitButton = new MessageButton()
+							.setStyle('Secondary');
+							const exitButton = new ButtonBuilder()
 							.setCustomId('exit')
 							.setLabel('Exit')
-							.setStyle('DANGER');
+							.setStyle('Danger');
 							const row = new ActionRowBuilder()
 							.addComponents(goBackButton)
 							.addComponents(exitButton)
@@ -341,15 +341,15 @@ module.exports = {
 									await wait(5000);
 									return serverSetup();
 								};
-								const botPermissionsIn = interaction.guild.me.permissionsIn(providedChannel).serialize();
-								const { VIEW_CHANNEL, SEND_MESSAGES, EMBED_LINKS, ATTACH_FILES, READ_MESSAGE_HISTORY } = botPermissionsIn;
-								const permissionsArray = [VIEW_CHANNEL, SEND_MESSAGES, EMBED_LINKS, ATTACH_FILES, READ_MESSAGE_HISTORY];
+								const botPermissionsIn = interaction.guild.members.me.permissionsIn(providedChannel).serialize();
+								const { ViewChannel, SendMessages, EmbedLinks, AttachFiles, ReadMessageHistory } = botPermissionsIn;
+								const permissionsArray = [ViewChannel, SendMessages, EmbedLinks, AttachFiles, ReadMessageHistory];
 								//Checking if the bot has all the required permissions in the channel being assigned for verification
 								const validation = permissionsArray.every(Boolean);
 								if(!validation){
 									//Error if required permissions are not present.
 									interaction.editReply({
-										embeds: [errorEmbed(`Missing required permissions.\nPlease make sure i have the following permissions on my role and in channel permissions:\n\`${['VIEW_CHANNEL', 'SEND_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'READ_MESSAGE_HISTORY', 'MANAGE_ROLES'].join('\n')}\`\n\nRun the \`/setup\` command once the permissions have been fixed.`, initiatorAvatar)],
+										embeds: [errorEmbed(`Missing required permissions.\nPlease make sure i have the following permissions on my role and in channel permissions:\n\`${['ViewChannel', 'SendMessages', 'EmbedLinks', 'AttachFiles', 'ReadMessageHistory', 'MANAGE_ROLES'].join('\n')}\`\n\nRun the \`/setup\` command once the permissions have been fixed.`, initiatorAvatar)],
 										components: []
 									});
 									await wait(5000);
@@ -366,12 +366,12 @@ module.exports = {
 									return;
 								});
 
-								const guideEmbed = new MessageEmbed()
+								const guideEmbed = new EmbedBuilder()
 								.setTitle('How To Verify')
 								.setDescription('Down below, you can find the steps on how you can verify your vehicle. Please make sure you follow all the steps and requirements listed below.')
-								.addField('Steps',`1. Take a picture of your vehicle by holding your vehicle keys and a piece of paper that has the server name \`(${guildName})\` and your Discord name + tag \`(${ownerTag})\` handwritten on it.\n2. Now type the slash command \`/verify\`, enter the vehicle name and upload the image you took in step one.\n3. Wait for your application to be processed by the server staff. Please keep your DMs open to get updates.\n\nAn example verification image is displayed below.`)
-								.addField('Rules & Requirements','1. It must be a vehicle.\n2. The paper must include the server name and discord username.\n3. The image must be clear.\n4. Only verify vehicles you own. Not rentals, friend\'s vehicles etc.')
-								.addField('After Verifying','1. You can checkout your garage using `/garage`\n2. You can personalize your vehicle by adding images, setting descriptions etc. using `/settings`.')
+								.addFields({name: 'Steps', value: `1. Take a picture of your vehicle by holding your vehicle keys and a piece of paper that has the server name \`(${guildName})\` and your Discord name + tag \`(${ownerTag})\` handwritten on it.\n2. Now type the slash command \`/verify\`, enter the vehicle name and upload the image you took in step one.\n3. Wait for your application to be processed by the server staff. Please keep your DMs open to get updates.\n\nAn example verification image is displayed below.`, inline: false})
+								.addFields({name: 'Rules & Requirements', value: '1. It must be a vehicle.\n2. The paper must include the server name and discord username.\n3. The image must be clear.\n4. Only verify vehicles you own. Not rentals, friend\'s vehicles etc.', inline: false})
+								.addFields({name: 'After Verifying', value: '1. You can checkout your garage using `/garage`\n2. You can personalize your vehicle by adding images, setting descriptions etc. using `/settings`.', inline: false})
 								.setImage('https://cdn.discordapp.com/attachments/975485952325726278/999390701471141928/Example_Image_1.png')
 								.setColor('#FFFCFF')
 								.setFooter({
@@ -382,7 +382,7 @@ module.exports = {
 									embeds: [guideEmbed]
 								});
 
-								const confirmationEmbed = new MessageEmbed()
+								const confirmationEmbed = new EmbedBuilder()
 								.setAuthor({
 									name: 'Server Setup - Guide Channel Configured',
 									iconURL: initiatorAvatar
@@ -407,7 +407,7 @@ module.exports = {
 					case "third_option":
 						async function setLogsChannel(){
 							if(!collected.deferred) await collected.deferUpdate();
-							const guideChannelEmbed = new MessageEmbed()
+							const guideChannelEmbed = new EmbedBuilder()
 							.setAuthor({
 								name: 'Server Setup - Setting The Logs Channel',
 								iconURL: initiatorAvatar
@@ -418,14 +418,14 @@ module.exports = {
 								text: footerText,
 								iconURL: footerIcon
 							});
-							const goBackButton = new MessageButton()
+							const goBackButton = new ButtonBuilder()
 							.setCustomId('goBack')
 							.setLabel('Go Back')
-							.setStyle('SECONDARY');
-							const exitButton = new MessageButton()
+							.setStyle('Secondary');
+							const exitButton = new ButtonBuilder()
 							.setCustomId('exit')
 							.setLabel('Exit')
-							.setStyle('DANGER');
+							.setStyle('Danger');
 							const row = new ActionRowBuilder()
 							.addComponents(goBackButton)
 							.addComponents(exitButton)
@@ -475,15 +475,15 @@ module.exports = {
 									await wait(5000);
 									return serverSetup();
 								};
-								const botPermissionsIn = interaction.guild.me.permissionsIn(providedChannel).serialize();
-								const { VIEW_CHANNEL, SEND_MESSAGES, EMBED_LINKS, ATTACH_FILES, READ_MESSAGE_HISTORY } = botPermissionsIn;
-								const permissionsArray = [VIEW_CHANNEL, SEND_MESSAGES, EMBED_LINKS, ATTACH_FILES, READ_MESSAGE_HISTORY];
+								const botPermissionsIn = interaction.guild.members.me.permissionsIn(providedChannel).serialize();
+								const { ViewChannel, SendMessages, EmbedLinks, AttachFiles, ReadMessageHistory } = botPermissionsIn;
+								const permissionsArray = [ViewChannel, SendMessages, EmbedLinks, AttachFiles, ReadMessageHistory];
 								//Checking if the bot has all the required permissions in the channel being assigned for verification
 								const validation = permissionsArray.every(Boolean);
 								if(!validation){
 									//Error if required permissions are not present.
 									interaction.editReply({
-										embeds: [errorEmbed(`Missing required permissions.\nPlease make sure i have the following permissions on my role and in channel permissions:\n\`${['VIEW_CHANNEL', 'SEND_MESSAGES', 'EMBED_LINKS', 'ATTACH_FILES', 'READ_MESSAGE_HISTORY', 'MANAGE_ROLES'].join('\n')}\`\n\nRun the \`/setup\` command once the permissions have been fixed.`, initiatorAvatar)],
+										embeds: [errorEmbed(`Missing required permissions.\nPlease make sure i have the following permissions on my role and in channel permissions:\n\`${['ViewChannel', 'SendMessages', 'EmbedLinks', 'AttachFiles', 'ReadMessageHistory', 'MANAGE_ROLES'].join('\n')}\`\n\nRun the \`/setup\` command once the permissions have been fixed.`, initiatorAvatar)],
 										components: []
 									});
 									await wait(5000);
@@ -499,7 +499,7 @@ module.exports = {
 									})
 									return;
 								});
-								const confirmationEmbed = new MessageEmbed()
+								const confirmationEmbed = new EmbedBuilder()
 								.setAuthor({
 									name: 'Server Setup - Logs Channel Configured',
 									iconURL: initiatorAvatar
@@ -524,7 +524,7 @@ module.exports = {
 					case "fourth_option":
 						async function setVerifiedRole(){
 							if(!collected.deferred) await collected.deferUpdate();
-							const verificationChannelEmbed = new MessageEmbed()
+							const verificationChannelEmbed = new EmbedBuilder()
 							.setAuthor({
 								name: 'Server Setup - Setting The Verified Role',
 								iconURL: initiatorAvatar
@@ -535,14 +535,14 @@ module.exports = {
 								text: footerText,
 								iconURL: footerIcon
 							});
-							const goBackButton = new MessageButton()
+							const goBackButton = new ButtonBuilder()
 							.setCustomId('goBack')
 							.setLabel('Go Back')
-							.setStyle('SECONDARY');
-							const exitButton = new MessageButton()
+							.setStyle('Secondary');
+							const exitButton = new ButtonBuilder()
 							.setCustomId('exit')
 							.setLabel('Exit')
-							.setStyle('DANGER');
+							.setStyle('Danger');
 							const row = new ActionRowBuilder()
 							.addComponents(goBackButton)
 							.addComponents(exitButton)
@@ -603,13 +603,13 @@ module.exports = {
 									})
 									return;
 								});
-								const confirmationEmbed = new MessageEmbed()
+								const confirmationEmbed = new EmbedBuilder()
 								.setAuthor({
 									name: 'Server Setup - Verified Role Configured',
 									iconURL: initiatorAvatar
 								})
 								.setDescription(`The Verified Role has been set as <@&${providedRole.id}>\nWhen a verification is approved, the applicant will be given this role.\n\nGoing back to main menu in 10 seconds...`)
-								.addField('Note','Please make sure that:\n1. The bot has permissions to manage roles.\n2. The role you wish to assign is under the bot\'s role.')
+								.addFields({name: 'Note', value: 'Please make sure that:\n1. The bot has permissions to manage roles.\n2. The role you wish to assign is under the bot\'s role.', inline: false})
 								.setColor(greenColor)
 								.setFooter({
 									text: footerText,
@@ -629,13 +629,19 @@ module.exports = {
 					case "fifth_option":
 						async function sync(){
 							if(!collected.deferred) await collected.deferUpdate();
+							interaction.editReply({
+								embeds: [errorEmbed('Sync is not currently implemented, going back to menu in 5 seconds...', initiatorAvatar)],
+								components: []
+							});
+							await wait(5000);
+							return serverSetup();
 						};
 						sync();
 						break;
 					case "sixth_option":
 						async function embedIcon(){
 							if(!collected.deferred) await collected.deferUpdate();
-							const requestIconEmbed = new MessageEmbed()
+							const requestIconEmbed = new EmbedBuilder()
 							.setAuthor({
 								name: 'Server Setup - Custom Embed Footer Icon',
 								iconURL: initiatorAvatar
@@ -692,7 +698,7 @@ module.exports = {
 									})
 									return;
 								});
-								const confirmationEmbed = new MessageEmbed()
+								const confirmationEmbed = new EmbedBuilder()
 								.setAuthor({
 									name: 'Server Setup - Custom Embed Icon Set',
 									iconURL: initiatorAvatar

@@ -9,7 +9,8 @@ const client = new Client({
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMessages,
                 GatewayIntentBits.GuildEmojisAndStickers,
-                GatewayIntentBits.GuildMembers
+                GatewayIntentBits.GuildMembers,
+                GatewayIntentBits.MessageContent
         ],
         presence: {
                 status: 'online',
