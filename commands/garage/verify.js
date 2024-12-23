@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { obtainGuildProfile, defaultEmbedColor, obtainAllUserVehicles, obtainAllOpenUserApplications } = require('../../modules/database.js');
 const verificationApplicationSchema = require('../../mongodb_schema/verificationApplicationSchema.js');
@@ -54,8 +54,8 @@ module.exports = {
 		//Misc
 		const mainInteractionId = interaction.id;
 		const embedColor = await defaultEmbedColor(initiatorId);
-		const preApprovalButtonFilter = (ButtonInteraction) => ButtonInteraction.componentType === 'BUTTON' && ButtonInteraction.user.id === initiatorId && (ButtonInteraction.customId === `confirmPreApproval+${mainInteractionId}` || ButtonInteraction.customId === `denyPreApproval+${mainInteractionId}`) && ButtonInteraction.guild.id === guildId;
-		const buttonFilter = (ButtonInteraction) => ButtonInteraction.componentType === 'BUTTON' && ButtonInteraction.user.id === initiatorId && (ButtonInteraction.customId === `confirmVerification+${mainInteractionId}` || ButtonInteraction.customId === `denyVerification+${mainInteractionId}`) && ButtonInteraction.guild.id === guildId;
+		const preApprovalButtonFilter = (ButtonInteraction) => ButtonInteraction.componentType === 2 && ButtonInteraction.user.id === initiatorId && (ButtonInteraction.customId === `confirmPreApproval+${mainInteractionId}` || ButtonInteraction.customId === `denyPreApproval+${mainInteractionId}`) && ButtonInteraction.guild.id === guildId;
+		const buttonFilter = (ButtonInteraction) => ButtonInteraction.componentType === 2 && ButtonInteraction.user.id === initiatorId && (ButtonInteraction.customId === `confirmVerification+${mainInteractionId}` || ButtonInteraction.customId === `denyVerification+${mainInteractionId}`) && ButtonInteraction.guild.id === guildId;
 		const todaysDate = moment.utc();
 		const verificationChannel = await interaction.member.guild.channels.fetch(verificationChannelId);
 		if(!verificationChannel){
@@ -159,7 +159,7 @@ module.exports = {
 		 * If yes, then proceed as usual.
 		*/
 
-		const preApprovalEmbed = new MessageEmbed()
+		const preApprovalEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: `Vehicle Verification`,
 			iconURL: initiatorAvatar
@@ -171,17 +171,17 @@ module.exports = {
 			iconURL: footerIcon
 		});
 
-		const preApprovalConfirmButton = new MessageButton()
+		const preApprovalConfirmButton = new ButtonBuilder()
 		.setCustomId(`confirmPreApproval+${mainInteractionId}`)
 		.setLabel("Yes")
-		.setStyle("PRIMARY");
+		.setStyle("Primary");
 
-		const preApprovalDenyButton = new MessageButton()
+		const preApprovalDenyButton = new ButtonBuilder()
 		.setCustomId(`denyPreApproval+${mainInteractionId}`)
 		.setLabel("No")
-		.setStyle("DANGER");
+		.setStyle("Danger");
 
-		const preApprovalRow = new MessageActionRow()
+		const preApprovalRow = new ActionRowBuilder()
 		.addComponents(preApprovalConfirmButton, preApprovalDenyButton);
 
 		await interaction.editReply({
@@ -206,30 +206,30 @@ module.exports = {
 			const buttonId = collectedData.customId;
 			if(buttonId === `confirmPreApproval+${mainInteractionId}`){
 				//continue with the verification
-				const verificationApplicationEmbed = new MessageEmbed()
+				const verificationApplicationEmbed = new EmbedBuilder()
 				.setAuthor({
 					name: `Vehicle Verification Application`,
 					iconURL: initiatorAvatar
 				})
 				.setDescription(`Hey **${initiatorUsername}!**\nThank you for showing interest in verifying your vehicle.\nCould you please confirm the details down below before we submit your application?`)
-				.addField('Vehicle Name', vehicleName, true)
-				.addField('Owner', initiatorTag, true)
-				.addField('Requirements', `Please make sure that \n1. The vehicle name you entered is correct and the way you like it as it will be the same in your garage.\n2. Your verification application meets the requirements listed out in <#${guideChannelId}> otherwise it will get rejected!`)
+				.addFields({name: 'Vehicle Name', value: vehicleName, inline: true})
+				.addFields({name: 'Owner', value: initiatorTag, inline: true})
+				.addFields({name: 'Requirements', value: `Please make sure that \n1. The vehicle name you entered is correct and the way you like it as it will be the same in your garage.\n2. Your verification application meets the requirements listed out in <#${guideChannelId}> otherwise it will get rejected!`, inline:false})
 				.setImage(vehicleImageURL)
 				.setColor(embedColor)
 				.setFooter({
 					text: footerText,
 					iconURL: footerIcon
 				});
-				const confirmButton = new MessageButton()
+				const confirmButton = new ButtonBuilder()
 				.setCustomId(`confirmVerification+${mainInteractionId}`)
 				.setLabel('Confirm')
-				.setStyle('SUCCESS');
-				const denyButton = new MessageButton()
+				.setStyle('Success');
+				const denyButton = new ButtonBuilder()
 				.setCustomId(`denyVerification+${mainInteractionId}`)
 				.setLabel('Deny')
-				.setStyle('DANGER');
-				const row = new MessageActionRow()
+				.setStyle('Danger');
+				const row = new ActionRowBuilder()
 				.addComponents(confirmButton)
 				.addComponents(denyButton)
 				await interaction.editReply({
@@ -254,35 +254,35 @@ module.exports = {
 					if(buttonId === `confirmVerification+${mainInteractionId}`){
 						//send it to the verification channel
 						//handle err if verification channel does not exist
-						const vApplication = new MessageEmbed()
+						const vApplication = new EmbedBuilder()
 						.setAuthor({
 							name: `Vehicle Verification - New Application`,
 							iconURL: initiatorAvatar
 						})
 						.setDescription('A new verification application has been registered. Please process the verification using the buttons provided down below.')
-						.addField('Vehicle', vehicleName, true)
-						.addField('Owner', `${initiatorTag} | <@${initiatorId}>`, true)
-						.addField('Image Name', `[${vehicleImageName}](${vehicleImageProxyURL})`, true)
-						.addField('Status', 'Due for verification',true)
+						.addFields({name: 'Vehicle', value: vehicleName, inline: true})
+						.addFields({name: 'Owner', value: `${initiatorTag} | <@${initiatorId}>`, inline: true})
+						.addFields({name: 'Image Name', value: `[${vehicleImageName}](${vehicleImageProxyURL})`, inline: true})
+						.addFields({name: 'Status', value: 'Due for verification', inline: true})
 						.setImage(vehicleImageURL)
 						.setColor('#FFFCFF') //Overriding the default embed color as white, red and green will be used as application status indicators.
 						.setFooter({
 							text: footerText,
 							iconURL: footerIcon
 						});
-						const approveButton = new MessageButton()
+						const approveButton = new ButtonBuilder()
 						.setCustomId(`approveApplication+${initiatorId}`)
 						.setLabel('Approve')
-						.setStyle('SUCCESS');
-						const denyButton = new MessageButton()
+						.setStyle('Success');
+						const denyButton = new ButtonBuilder()
 						.setCustomId(`denyApplication+${initiatorId}`)
 						.setLabel('Deny')
-						.setStyle('DANGER');
-						const denyButton2 = new MessageButton()
+						.setStyle('Danger');
+						const denyButton2 = new ButtonBuilder()
 						.setCustomId(`denyReadGuide+${initiatorId}`)
 						.setLabel('Read The Guide')
-						.setStyle('DANGER');
-						const row = new MessageActionRow()
+						.setStyle('Danger');
+						const row = new ActionRowBuilder()
 						.addComponents(approveButton)
 						.addComponents(denyButton)
 						.addComponents(denyButton2)
@@ -295,7 +295,7 @@ module.exports = {
 						const applicationMsgId = applicationMsg.id;
 						
 						const verificationApplication = new verificationApplicationSchema({
-							_id: mongoose.Types.ObjectId(),
+							_id: new mongoose.Types.ObjectId(),
 							guildId: guildId,
 							userId: initiatorId,
 							vehicle: vehicleName,
@@ -314,16 +314,16 @@ module.exports = {
 						.then(async result => {
 							console.log(`New verification application submitted:\n ${result}`)
 							//Logging the newly created verification application.
-							const vApplicationLog = new MessageEmbed()
+							const vApplicationLog = new EmbedBuilder()
 							.setAuthor({
 								name: `Vehicle Verification - New Application`,
 								iconURL: initiatorAvatar
 							})
-							.addField('Vehicle', vehicleName, true)
-							.addField('Owner', `${initiatorTag} | <@${initiatorId}>`, true)
-							.addField('Image Name', vehicleImageName)
-							.addField('Status', 'Due for verification', true)
-							.addField('Verification Image Proxy Url', `[Click Here](${vehicleImageProxyURL})`)
+							.addFields({name: 'Vehicle', value: vehicleName, inline: true})
+							.addFields({name: 'Owner', value: `${initiatorTag} | <@${initiatorId}>`, inline: true})
+							.addFields({name: 'Image Name', value: vehicleImageName, inline: false})
+							.addFields({name: 'Status', value: 'Due for verification', inline: true})
+							.addFields({name: 'Verification Image Proxy Url', value: `[Click Here](${vehicleImageProxyURL})`, inline: false})
 							.setThumbnail(vehicleImageURL)
 							.setColor('#FFFCFF') //Overriding the default embed color as white, red and green will be used as application status indicators.
 							.setFooter({
@@ -333,7 +333,7 @@ module.exports = {
 
 							verificationApplicationEmbed
 							.setDescription('Your verfication application has been successfully submitted. Please wait for the staff to verify it.')
-							.addField('Note','**Please keep your DMs open** to recieve updates regarding your verification.')
+							.addFields({name: 'Note', value: '**Please keep your DMs open** to recieve updates regarding your verification.', inline: false})
 							.setColor(greenColor)
 							await interaction.editReply({
 								embeds:[verificationApplicationEmbed],
@@ -361,7 +361,7 @@ module.exports = {
 				});
 
 			}else{
-				const preApprovalDeniedEmbed = new MessageEmbed()
+				const preApprovalDeniedEmbed = new EmbedBuilder()
 				.setAuthor({
 					name: `Vehicle Verification - Denied`,
 					iconURL: initiatorAvatar

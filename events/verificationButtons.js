@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageActionRow, MessageButton, ButtonInteraction } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonInteraction } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { obtainGuildProfile, defaultEmbedColor, obtainAllUserVehicles, obtainOneOpenUserApplication, obtainUserProfile } = require('../modules/database.js');
 const garageSchema = require('../mongodb_schema/garageSchema.js');
@@ -47,9 +47,9 @@ module.exports = {
             const initiatorAvatar = interaction.user.displayAvatarURL({ dynamic: true });
             const initiatorTag = interaction.user.tag
             //Verificaton application embed
-            const vApplicationEmbed = interaction.message.embeds[0]
+            const vApplicationEmbed = EmbedBuilder.from(interaction.message.embeds[0])
             const applicantId = buttonUserId
-            const vehicleName = vApplicationEmbed.fields[0].value;
+            const vehicleName = interaction.message.embeds[0].fields[0].value
             const applicationData = await obtainOneOpenUserApplication(applicantId, guildId, vehicleName);
             if(!applicationData){
                 await interaction.followUp({
@@ -73,32 +73,31 @@ module.exports = {
                     })
                     return;
                 });
-
-                vApplicationEmbed.fields[3].value = `Verification Denied | Reason: ${denialReason}`;
+                vApplicationEmbed.spliceFields(3,1, {name: 'Status', value: `Verification Denied | Reason: ${denialReason}`});
                 vApplicationEmbed.color = redColor
-                vApplicationEmbed.addField('Decided By', `${initiatorTag} | <@${initiatorId}>`);
+                vApplicationEmbed.addFields({name: 'Decided By', value: `${initiatorTag} | <@${initiatorId}>`, inline: false});
                 
-                const deniedButton = new MessageButton()
+                const deniedButton = new ButtonBuilder()
                 .setCustomId('disabled')
                 .setLabel('Denied - Read The Guide')
-                .setStyle('DANGER')
+                .setStyle('Danger')
                 .setDisabled(true);
-                const row = new MessageActionRow()
+                const row = new ActionRowBuilder()
                 .addComponents(deniedButton)
                 await interaction.editReply({
                     embeds: [vApplicationEmbed],
                     components: [row]
                 });
 
-                const logEmbed = new MessageEmbed()
+                const logEmbed = new EmbedBuilder()
                 .setAuthor({
                     name: 'Vehicle Verification Processed',
                     iconURL: applicantAvatar
                 })
-                .addField('Vehicle', vehicleName, true)
-                .addField('Owner', `${applicantTag} | <@${applicantId}>`,true)
-                .addField('Decision',`Denied Verification | Reason: ${denialReason}`)
-                .addField('Decided By', `${initiatorTag} | <@${initiatorId}>`)
+                .addFields({name: 'Vehicle', value: vehicleName, inline: true})
+                .addFields({name: 'Owner', value: `${applicantTag} | <@${applicantId}>`, inline: true})
+                .addFields({name: 'Decision', value: `Denied Verification | Reason: ${denialReason}`, inline: false})
+                .addFields({name: 'Decided By', value: `${initiatorTag} | <@${initiatorId}>`, inline: false})
                 .setThumbnail(vehicleImageURL)
                 .setColor(redColor)
                 .setFooter({
@@ -155,7 +154,7 @@ module.exports = {
                         });
 
                         const newVerifiedRide = new garageSchema({
-                            _id: mongoose.Types.ObjectId(),
+                            _id: new mongoose.Types.ObjectId(),
                             guildId: guildId,
                             userId: applicantId,
                             vehicle: vehicleName,
@@ -176,7 +175,7 @@ module.exports = {
                         if(!userProfile){
                             //Creating the user profile for the new verified vehicle owner.
                             const newUserProfile = new userProfileSchema({
-                                _id: mongoose.Types.ObjectId(),
+                                _id: new mongoose.Types.ObjectId(),
                                 userId: applicantId,
                                 premiumUser: false,
                                 premiumTier: 0,
@@ -188,17 +187,16 @@ module.exports = {
                                 console.log(err);
                             });
                         };
-
-                        vApplicationEmbed.fields[3].value = 'Verified Successfully';
+                        vApplicationEmbed.spliceFields(3,1, {name: 'Status', value: 'Verified Successfully'});
                         vApplicationEmbed.color = greenColor
-                        vApplicationEmbed.addField('Decided By', `${initiatorTag} | <@${initiatorId}>`);
+                        vApplicationEmbed.addFields({name: 'Decided By', value: `${initiatorTag} | <@${initiatorId}>`, inline: false});
                         
-                        const confirmedButton = new MessageButton()
+                        const confirmedButton = new ButtonBuilder()
                         .setCustomId('disabled')
                         .setLabel('Approved')
-                        .setStyle('SUCCESS')
+                        .setStyle('Success')
                         .setDisabled(true);
-                        const row = new MessageActionRow()
+                        const row = new ActionRowBuilder()
                         .addComponents(confirmedButton)
                         await interaction.editReply({
                             embeds: [vApplicationEmbed],
@@ -216,16 +214,16 @@ module.exports = {
                         };
 
                         //Dm notification to the applicant.
-                        const dmNotification = new MessageEmbed()
+                        const dmNotification = new EmbedBuilder()
                         .setAuthor({
                             name: 'Vehicle Verification Processed',
                             iconURL: applicantAvatar
                         })
                         .setDescription("Your vehicle verification application has been successfully processed. You can find the details down below.")
-                        .addField('Vehicle', vehicleName, true)
-                        .addField('Owner', `${applicantTag} | <@${applicantId}>`,true)
-                        .addField('Decision','Approved Verification | You can check out your vehicle in your garage now using the `/garage` command.')
-                        .addField('Note','You can now keep images to your rides, configure your garage using the `/settings` command in the designated bot commands channel.')
+                        .addFields({name: 'Vehicle', value: vehicleName, inline: true})
+                        .addFields({name: 'Owner', value: `${applicantTag} | <@${applicantId}>`, inline: true})
+                        .addFields({name: 'Decision', value:'Approved Verification | You can check out your vehicle in your garage now using the `/garage` command.', inline: false})
+                        .addFields({name: 'Note', value: 'You can now keep images to your rides, configure your garage using the `/settings` command in the designated bot commands channel.', inline: false})
                         .setThumbnail(vehicleImageURL)
                         .setColor(greenColor)
                         .setFooter({
@@ -244,15 +242,15 @@ module.exports = {
                         });
 
                         //Log it
-                        const logEmbed = new MessageEmbed()
+                        const logEmbed = new EmbedBuilder()
                         .setAuthor({
                             name: 'Vehicle Verification Processed',
                             iconURL: applicantAvatar
                         })
-                        .addField('Vehicle', vehicleName, true)
-                        .addField('Owner', `${applicantTag} | <@${applicantId}>`,true)
-                        .addField('Decision','Approved Verification')
-                        .addField('Decided By', `${initiatorTag} | <@${initiatorId}>`)
+                        .addFields({name: 'Vehicle', value: vehicleName, inline: true})
+                        .addFields({name: 'Owner', value: `${applicantTag} | <@${applicantId}>`, inline: true})
+                        .addFields({name: 'Decision', value: 'Approved Verification', inline: false})
+                        .addFields({name: 'Decided By', value: `${initiatorTag} | <@${initiatorId}>`, inline: false})
                         .setThumbnail(vehicleImageURL)
                         .setColor(greenColor)
                         .setFooter({
@@ -310,17 +308,16 @@ module.exports = {
                             })
                             return;
                         });
-
-                        vApplicationEmbed.fields[3].value = `Verification Denied | Reason: ${denialReason}`;
+                        vApplicationEmbed.spliceFields(3,1, {name: 'Status', value: `Verification Denied | Reason: ${denialReason}`});
                         vApplicationEmbed.color = redColor
-                        vApplicationEmbed.addField('Decided By', `${initiatorTag} | <@${initiatorId}>`);
+                        vApplicationEmbed.addFields({name: 'Decided By', value: `${initiatorTag} | <@${initiatorId}>`, inline: false});
                         
-                        const deniedButton = new MessageButton()
+                        const deniedButton = new ButtonBuilder()
                         .setCustomId('disabled')
                         .setLabel('Denied')
-                        .setStyle('DANGER')
+                        .setStyle('Danger')
                         .setDisabled(true);
-                        const row = new MessageActionRow()
+                        const row = new ActionRowBuilder()
                         .addComponents(deniedButton)
                         await interaction.editReply({
                             embeds: [vApplicationEmbed],
@@ -328,15 +325,15 @@ module.exports = {
                         });
 
                         //Dm notification to the applicant.
-                        const dmNotification = new MessageEmbed()
+                        const dmNotification = new EmbedBuilder()
                         .setAuthor({
                             name: 'Vehicle Verification Processed',
                             iconURL: applicantAvatar
                         })
                         .setDescription("Your vehicle verification application has been successfully processed. You can find the details down below.")
-                        .addField('Vehicle', vehicleName, true)
-                        .addField('Owner', `${applicantTag} | <@${applicantId}>`,true)
-                        .addField('Decision',`Denied Verification | Reason: ${denialReason}`)
+                        .addFields({name: 'Vehicle', value: vehicleName, inline: true})
+                        .addFields({name: 'Owner', value: `${applicantTag} | <@${applicantId}>`, inline: true})
+                        .addFields({name: 'Decision', value: `Denied Verification | Reason: ${denialReason}`, inline: false})
                         .setThumbnail(vehicleImageURL)
                         .setColor(redColor)
                         .setFooter({
@@ -355,15 +352,15 @@ module.exports = {
                         });
                         
                          //Log it
-                         const logEmbed = new MessageEmbed()
+                         const logEmbed = new EmbedBuilder()
                          .setAuthor({
                              name: 'Vehicle Verification Processed',
                              iconURL: applicantAvatar
                          })
-                         .addField('Vehicle', vehicleName, true)
-                         .addField('Owner', `${applicantTag} | <@${applicantId}>`,true)
-                         .addField('Decision',`Denied Verification | Reason: ${denialReason}`)
-                         .addField('Decided By', `${initiatorTag} | <@${initiatorId}>`)
+                         .addFields({name: 'Vehicle', value: vehicleName, inline: true})
+                         .addFields({name: 'Owner', value: `${applicantTag} | <@${applicantId}>`, inline: true})
+                         .addFields({name: 'Decision', value: `Denied Verification | Reason: ${denialReason}`, inline: false})
+                         .addFields({name: 'Decided By', value: `${initiatorTag} | <@${initiatorId}>`, inline: false})
                          .setThumbnail(vehicleImageURL)
                          .setColor(redColor)
                          .setFooter({
@@ -410,17 +407,16 @@ module.exports = {
                             })
                             return;
                         });
-
-                        vApplicationEmbed.fields[3].value = `Verification Denied | Reason: ${denialReason}`;
+                        vApplicationEmbed.spliceFields(3,1, {name: 'Status', value: `Verification Denied | Reason: ${denialReason}`});
                         vApplicationEmbed.color = redColor
-                        vApplicationEmbed.addField('Decided By', `${initiatorTag} | <@${initiatorId}>`);
+                        vApplicationEmbed.addFields({name: 'Decided By', value:`${initiatorTag} | <@${initiatorId}>`, inline: false});
                         
-                        const deniedButton = new MessageButton()
+                        const deniedButton = new ButtonBuilder()
                         .setCustomId('disabled')
                         .setLabel('Denied - Read The Guide')
-                        .setStyle('DANGER')
+                        .setStyle('Danger')
                         .setDisabled(true);
-                        const row = new MessageActionRow()
+                        const row = new ActionRowBuilder()
                         .addComponents(deniedButton)
                         await interaction.editReply({
                             embeds: [vApplicationEmbed],
@@ -428,15 +424,15 @@ module.exports = {
                         });
 
                         //Dm notification to the applicant.
-                        const dmNotification = new MessageEmbed()
+                        const dmNotification = new EmbedBuilder()
                         .setAuthor({
                             name: 'Vehicle Verification Processed',
                             iconURL: applicantAvatar
                         })
                         .setDescription("Your vehicle verification application has been successfully processed. You can find the details down below.")
-                        .addField('Vehicle', vehicleName, true)
-                        .addField('Owner', `${applicantTag} | <@${applicantId}>`,true)
-                        .addField('Decision',`Denied Verification | Reason: ${denialReason}`)
+                        .addFields({name: 'Vehicle', value: vehicleName, inline: true})
+                        .addFields({name: 'Owner', value: `${applicantTag} | <@${applicantId}>`, inline: true})
+                        .addFields({name: 'Decision', value: `Denied Verification | Reason: ${denialReason}`, inline: false})
                         .setThumbnail(vehicleImageURL)
                         .setColor(redColor)
                         .setFooter({
@@ -455,15 +451,15 @@ module.exports = {
                         });
                         
                          //Log it
-                         const logEmbed = new MessageEmbed()
+                         const logEmbed = new EmbedBuilder()
                          .setAuthor({
                              name: 'Vehicle Verification Processed',
                              iconURL: applicantAvatar
                          })
-                         .addField('Vehicle', vehicleName, true)
-                         .addField('Owner', `${applicantTag} | <@${applicantId}>`,true)
-                         .addField('Decision',`Denied Verification | Reason: ${denialReason}`)
-                         .addField('Decided By', `${initiatorTag} | <@${initiatorId}>`)
+                         .addFields({name: 'Vehicle', value: vehicleName, inline: true})
+                         .addFields({name: 'Owner', value: `${applicantTag} | <@${applicantId}>`, inline: true})
+                         .addFields({name: 'Decision', value: `Denied Verification | Reason: ${denialReason}`, inline: false})
+                         .addFields({name: 'Decided By', value: `${initiatorTag} | <@${initiatorId}>`, inline: false})
                          .setThumbnail(vehicleImageURL)
                          .setColor(redColor)
                          .setFooter({
