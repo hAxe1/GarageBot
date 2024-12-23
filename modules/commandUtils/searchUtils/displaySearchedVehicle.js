@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 
 async function displaySearchedVehicle(
     interaction,
@@ -46,7 +46,7 @@ async function displaySearchedVehicle(
         return;
     };
 
-    const vehicleEmbed = new MessageEmbed()
+    const vehicleEmbed = new EmbedBuilder()
     .setAuthor({
         name: `${vehicleName} - Driven By ${userTag}`,
         iconURL: userAvatar
@@ -59,13 +59,13 @@ async function displaySearchedVehicle(
     })
     if(vehicleDescription) vehicleEmbed.setDescription(vehicleDescription);
     let componentsArray = [];
-    const row = new MessageActionRow() 
-    const previousButton = new MessageButton()
+    const row = new ActionRowBuilder() 
+    const previousButton = new ButtonBuilder()
     .setCustomId(`previousVehicleImageSearch+${mainInteractionId}`)
     .setLabel('Previous')
     .setStyle('PRIMARY')
     .setDisabled(true);
-    const nextButton = new MessageButton()
+    const nextButton = new ButtonBuilder()
     .setCustomId(`nextVehicleImageSearch+${mainInteractionId}`)
     .setLabel('Next')
     .setStyle('PRIMARY');
@@ -100,7 +100,7 @@ async function displaySearchedVehicle(
                     if (page >= pages.length){
                         nextButton.setDisabled(true);
                     };
-                    const nextRow = new MessageActionRow() 
+                    const nextRow = new ActionRowBuilder() 
                     nextRow.addComponents(previousButton).addComponents(nextButton);
                     await interaction.editReply({
                         embeds: [vehicleEmbed],
@@ -121,7 +121,7 @@ async function displaySearchedVehicle(
                     if (page <= 1){
                         previousButton.setDisabled(true);
                     };
-                    const prevRow = new MessageActionRow() 
+                    const prevRow = new ActionRowBuilder() 
                     prevRow.addComponents(previousButton).addComponents(nextButton);
                     await interaction.editReply({
                         embeds: [vehicleEmbed],

@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 const { removeNonIntegers } = require('../../utility.js');
 const { capitalizeFirstLetter } = require('../../utility.js')
@@ -69,7 +69,7 @@ async function searchSelection(
                 const pages = pageOutput;
                 let page = 1;
                 if(!searchTerm) searchTerm = 'All';
-                const searchSelectionEmbed = new MessageEmbed()
+                const searchSelectionEmbed = new EmbedBuilder()
                 .setAuthor({
                     name: `${searchType} Search - ${searchTerm} • ${page} of ${pages.length}`,
                     iconURL: initiatorAvatar
@@ -81,18 +81,18 @@ async function searchSelection(
                     iconURL: footerData.icon
                 });
 
-                const previousButton = new MessageButton()
+                const previousButton = new ButtonBuilder()
                 .setCustomId(`previousSearchPage+${mainInteractionId}`)
                 .setLabel('Previous')
-                .setStyle('PRIMARY')
+                .setStyle('Primary')
                 .setDisabled(true);
-                const nextButton = new MessageButton()
+                const nextButton = new ButtonBuilder()
                 .setCustomId(`nextSearchPage+${mainInteractionId}`)
                 .setLabel('Next')
-                .setStyle('PRIMARY');
+                .setStyle('Primary');
 
                 let componentsArray = []
-                const row = new MessageActionRow()
+                const row = new ActionRowBuilder()
                 row.addComponents(previousButton, nextButton);
                 if(pages.length > 1) componentsArray = [row]
                 await interaction.editReply({
@@ -113,7 +113,7 @@ async function searchSelection(
 								if (page <= 1){
 									previousButton.setDisabled(true);
 								};
-								const previousRow = new MessageActionRow() 
+								const previousRow = new ActionRowBuilder() 
 								previousRow.addComponents(previousButton).addComponents(nextButton);
                                 searchSelectionEmbed
                                 .setAuthor({
@@ -135,7 +135,7 @@ async function searchSelection(
                             if (page >= pages.length){
                                 nextButton.setDisabled(true);
                             };
-                            const nextRow = new MessageActionRow()
+                            const nextRow = new ActionRowBuilder()
                             .addComponents(previousButton).addComponents(nextButton);
                             searchSelectionEmbed
                             .setAuthor({

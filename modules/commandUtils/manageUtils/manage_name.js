@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const { exitGlobal } = require('./options/exitGlobal.js');
 const { backGlobal } = require('./options/backGlobal.js');
 const { setName } = require('./options/nameOptions/setName.js');
@@ -48,29 +48,29 @@ async function manageName(
     const buttonFilter = i => i.user.id === initiatorId && i.guild.id === guildId;
     const messageFilter = (m) => m.author.id === initiatorId && m.guild.id === guildId;
 
-    const manageNameDashboardEmbed = new MessageEmbed()
+    const manageNameDashboardEmbed = new EmbedBuilder()
     .setAuthor({
         name: 'Management Dashboard - Vehicle Name',
         iconURL: initiatorAvatar
     })
     .setDescription('What would you like to change the name of the following vehicle to?')
     .setColor(embedColor)
-    .addField('Vehicle', `[${vehicleName}](${verificationImage})`, true)
-    .addField('Owner', userTag, true)
+    .addFields({name: 'Vehicle', value: `[${vehicleName}](${verificationImage})`, inline: true})
+    .addFields({name: 'Owner', value: userTag, inline: true})
     .setFooter({
         text: footerText,
         iconURL: footerIcon
     });
 
-    const buttonsRow = new MessageActionRow()
+    const buttonsRow = new ActionRowBuilder()
     .addComponents(
-        new MessageButton()
+        new ButtonBuilder()
         .setLabel('Back')
-        .setStyle('SECONDARY')
+        .setStyle('Secondary')
         .setCustomId(`backName+${mainInteractionId}`),
-        new MessageButton()
+        new ButtonBuilder()
         .setLabel('Exit')
-        .setStyle('DANGER')
+        .setStyle('Danger')
         .setCustomId(`exitName+${mainInteractionId}`)
     );
 

@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageActionRow, MessageButton} = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder} = require('discord.js');
 const { exitGlobal } = require('../exitGlobal.js');
 const { backGlobal } = require('../backGlobal.js');
 const { redColor, errorEmbed } = require('../../../../utility.js');
@@ -45,34 +45,34 @@ async function cancelDelete(
      //Filters
      const buttonFilter = i => i.user.id === initiatorId && i.guild.id === guildId;
 
-    const cancelDeleteEmbed = new MessageEmbed()
+    const cancelDeleteEmbed = new EmbedBuilder()
     .setAuthor({
         name: 'Management Dashboard - Delete Vehicle',
         iconURL: initiatorAvatar
     })
     .setDescription('The operation was cancelled. Please use the buttons below to proceed.')
     .setColor(redColor)
-    .addField('Vehicle', `[${vehicleName}](${verificationImage})`, true)
-    .addField('Owner', userTag, true)
+    .addFields({name: 'Vehicle', value: `[${vehicleName}](${verificationImage})`, inline: true})
+    .addFields({name: 'Owner', value: userTag, inline: true})
     .setFooter({
         text: footerText,
         iconURL: footerIcon
     });
 
-    const buttonsRow = new MessageActionRow()
+    const buttonsRow = new ActionRowBuilder()
     .addComponents(
-        new MessageButton()
+        new ButtonBuilder()
         .setLabel('Canceled')
-        .setStyle('DANGER')
+        .setStyle('Danger')
         .setCustomId(`disabled`)
         .setDisabled(true),
-        new MessageButton()
+        new ButtonBuilder()
         .setLabel('Back')
-        .setStyle('SECONDARY')
+        .setStyle('Secondary')
         .setCustomId(`backCancelDelete+${mainInteractionId}`),
-        new MessageButton()
+        new ButtonBuilder()
         .setLabel('Exit')
-        .setStyle('DANGER')
+        .setStyle('Danger')
         .setCustomId(`exitCancelDelete+${mainInteractionId}`)
     );
     

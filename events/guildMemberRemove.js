@@ -1,4 +1,4 @@
-const { MessageActionRow, MessageButton } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const { obtainGuildProfile, obtainAllOpenUserApplications } = require('../modules/database.js');
 const verificationSchema = require('../mongodb_schema/verificationApplicationSchema.js');
 const { redColor, botId } = require('../modules/utility.js');
@@ -31,12 +31,12 @@ module.exports = {
 			applicationEmbed.fields[3].value = `Verification Denied | Reason: User left the server.`;
 			applicationEmbed.color = redColor
 			applicationEmbed.addField('Decided By', `Automatic`);
-			const deniedButton = new MessageButton()
+			const deniedButton = new ButtonBuilder()
 			.setCustomId('disabled')
 			.setLabel('Denied - User Left')
-			.setStyle('DANGER')
+			.setStyle('Danger')
 			.setDisabled(true);
-			const row = new MessageActionRow()
+			const row = new ActionRowBuilder()
 			.addComponents(deniedButton)
 			applicationMessage.edit({
 				embeds: [applicationEmbed],

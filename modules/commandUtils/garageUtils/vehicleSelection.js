@@ -1,4 +1,4 @@
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 const { removeNonIntegers } = require('../../utility.js');
 
@@ -23,7 +23,7 @@ async function vehicleSelection(garage, userData, footerText, footerIcon, embedC
                     return `\`${y+1}.\` ${x.vehicle}`
                 });
 
-                const garageEmbed = new MessageEmbed()
+                const garageEmbed = new EmbedBuilder()
                 .setAuthor({
                     name: `${userTag}'s Garage`,
                     iconURL: userAvatar

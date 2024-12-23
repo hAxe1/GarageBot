@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const { exitGlobal } = require('../exitGlobal.js');
 const { backGlobal } = require('../backGlobal.js');
 const garageSchema = require('../../../../../mongodb_schema/garageSchema.js');
@@ -58,35 +58,35 @@ await garageSchema.updateOne({guildId: guildId, userId: userId, vehicle: vehicle
     return;
 });
 
-const manageNameConfirmDashboardEmbed = new MessageEmbed()
+const manageNameConfirmDashboardEmbed = new EmbedBuilder()
 .setAuthor({
     name: 'Management Dashboard - Vehicle Name',
     iconURL: initiatorAvatar
 })
 .setDescription('The name has been updated successfully for the following vehicle.')
 .setColor(greenColor)
-.addField('Previous Vehicle Name', `[${vehicleName}](${verificationImage})`, true)
-.addField('New Vehicle Name', `[${providedName}](${verificationImage})`, true)
-.addField('Owner', userTag, true)
+.addFields({name: 'Previous Vehicle Name', value: `[${vehicleName}](${verificationImage})`, inline: true})
+.addFields({name: 'New Vehicle Name', value: `[${providedName}](${verificationImage})`, inline: true})
+.addFields({name: 'Owner', value: userTag, inline: true})
 .setFooter({
     text: footerText,
     iconURL: footerIcon
 });
 
-const buttonsRow = new MessageActionRow()
+const buttonsRow = new ActionRowBuilder()
 .addComponents(
-    new MessageButton()
+    new ButtonBuilder()
     .setLabel('Successful')
-    .setStyle('SUCCESS')
+    .setStyle('Success')
     .setCustomId(`disabled`)
     .setDisabled(true),
-    new MessageButton()
+    new ButtonBuilder()
     .setLabel('Back')
-    .setStyle('SECONDARY')
+    .setStyle('Secondary')
     .setCustomId(`backNameConfirmed+${mainInteractionId}`),
-    new MessageButton()
+    new ButtonBuilder()
     .setLabel('Exit')
-    .setStyle('DANGER')
+    .setStyle('Danger')
     .setCustomId(`exitNameConfirmed+${mainInteractionId}`)
 );
 

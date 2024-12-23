@@ -1,5 +1,5 @@
 
-const { MessageEmbed, MessageActionRow, MessageSelectMenu } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
 const { obtainGuildProfile, obtainAllUserVehicles } = require('../../database.js');
 const { vehicleSelection } = require('../garageUtils/vehicleSelection.js');
 const { botIcon, errorEmbed } = require('../../utility.js');
@@ -33,7 +33,7 @@ async function manageDashboard(
     const guildIcon = guildData.iconURL({ dynamic: true });	
     
     //Filters
-    const menuFilter = (menuInteraction) => menuInteraction.componentType === 'SELECT_MENU' && menuInteraction.customId === `manageMenu+${mainInteractionId}` && menuInteraction.user.id === initiatorId && menuInteraction.guild.id === guildId;
+    const menuFilter = (menuInteraction) => menuInteraction.componentType === 3 && menuInteraction.customId === `manageMenu+${mainInteractionId}` && menuInteraction.user.id === initiatorId && menuInteraction.guild.id === guildId;
    
     //Misc
     const mainInteractionId = interaction.id;
@@ -107,23 +107,23 @@ async function manageDashboard(
     let vehicleDescription = selectedVehicleData.vehicleDescription;
     let vehicleImages = selectedVehicleData.vehicleImages;
     
-    const settingsDashboardEmbed = new MessageEmbed()
+    const settingsDashboardEmbed = new EmbedBuilder()
     .setAuthor({
         name: 'Verified Vehicle Management',
         iconURL: initiatorAvatar
     })
     .setDescription('This dashboard allows you to configure verified vehicles owned by a user.\nStart by selecting on the option you would ike to explore from the menu below. ')
-    .addField('Vehicle', `[${vehicleName}](${verificationImage})`, true)
-    .addField('Owner', userTag, true)
+    .addFields({name: 'Vehicle', value: `[${vehicleName}](${verificationImage})`, inline: true})
+    .addFields({name: 'Owner', value: userTag, inline: true})
     .setColor(embedColor)
     .setFooter({
         text: footerText,
         iconURL: footerIcon
     });
     
-    const row = new MessageActionRow()
+    const row = new ActionRowBuilder()
     .addComponents(
-        new MessageSelectMenu()
+        new StringSelectMenuBuilder()
             .setCustomId(`manageMenu+${mainInteractionId}`)
             .setPlaceholder('Select the option you wish to configure...')
             .addOptions([

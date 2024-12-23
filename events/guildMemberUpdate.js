@@ -1,6 +1,6 @@
 const { obtainUserProfile } = require('../modules/database.js');
 const { patreonLogChannelId, botIcon, patreonT1, patreonT2, patreonT3, patreonT4, patreonDefault, patreonRedColor, supportServerId } = require('../modules/utility.js');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const mongoose = require('mongoose');
 const userProfileSchema = require('../mongodb_schema/userProfileSchema.js');
 
@@ -34,10 +34,10 @@ module.exports = {
                         console.log(err);
                     });
                 };
-                const patreonLogEmbed = new MessageEmbed()
+                const patreonLogEmbed = new EmbedBuilder()
                 .setTitle('New Patron Registered')
                 .setDescription("A new patron was registered into the database.")
-                .addField('User', `${userTag} | <@${userId}>`, true)
+                .addFields({name: 'User', value: `${userTag} | <@${userId}>`, inline: true})
                 .setColor(patreonRedColor)
                 .setFooter({
                     text: 'ThrottleBot Vehicle Verification',
@@ -45,16 +45,16 @@ module.exports = {
                 });
                 if(role === patreonT1){
                     await userProfile.updateOne({ userId: userId }, { $set: {premiumUser: true, premiumTier: 1} })
-                    patreonLogEmbed.addField('Tier', `<@&${patreonT1}>`, true);
+                    patreonLogEmbed.addFields({name: 'Tier', value: `<@&${patreonT1}>`, inline: true});
                 }else if(role === patreonT2){
                     await userProfile.updateOne({ userId: userId }, { $set: {premiumUser: true, premiumTier: 2} })
-                    patreonLogEmbed.addField('Tier', `<@&${patreonT2}>`, true);
+                    patreonLogEmbed.addFields({name:'Tier', value: `<@&${patreonT2}>`, inline: true});
                 }else if(role === patreonT3){
                     await userProfile.updateOne({ userId: userId }, { $set: {premiumUser: true, premiumTier: 3} })
-                    patreonLogEmbed.addField('Tier', `<@&${patreonT3}>`, true);
+                    patreonLogEmbed.addFields({name: 'Tier', value: `<@&${patreonT3}>`, inline: true});
                 }else if(role === patreonT4){
                     await userProfile.updateOne({ userId: userId }, { $set: {premiumUser: true, premiumTier: 4} })
-                    patreonLogEmbed.addField('Tier', `<@&${patreonT4}>`, true);
+                    patreonLogEmbed.addFields({name: 'Tier', value: `<@&${patreonT4}>`, inline: true});
                 };
                 patreonLogChannel.send({
                     embeds: [patreonLogEmbed]

@@ -1,5 +1,6 @@
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ComponentType } = require('discord.js');
 const { botInvite, supportServerInvite, githubLink, ownerTag, ownerAvatar, errorEmbed} = require('../../utility.js');
+const { searchExit } = require('./searchExit.js')
 const garageSchema = require('../../../mongodb_schema/garageSchema.js');
 const { searchSelection } = require('./searchSelection.js');
 const { displaySearchedVehicle } = require('./displaySearchedVehicle.js');
@@ -37,17 +38,17 @@ async function searchServer(
     if(!searchData || searchData?.length === 0){
         const searchGlobalData = await garageSchema.find( { vehicle: { $regex: searchTerm , $options : 'i'} } );
 
-        const searchGlobalButton = new MessageButton()
+        const searchGlobalButton = new ButtonBuilder()
         .setCustomId(`searchGlobal+${mainInteractionId}`)
         .setLabel('Search Globally')
-        .setStyle('SECONDARY');
-        const exitButton = new MessageButton()
+        .setStyle('Secondary');
+        const exitButton = new ButtonBuilder()
         .setCustomId(`searchExit+${mainInteractionId}`)
         .setLabel('Exit')
-        .setStyle('DANGER');
+        .setStyle('Danger');
 
         if(searchGlobalData && searchGlobalData.length > 0){
-            const row = new MessageActionRow() 
+            const row = new ActionRowBuilder() 
             .addComponents(exitButton);
             await interaction.editReply({
                 embeds:[errorEmbed(`The server-wide search returned no results.`,initiatorAvatar)],
@@ -56,7 +57,7 @@ async function searchServer(
             //Globally ${searchGlobalData.length.toLocaleString()} results were found. Click on the **Search Global** button to view them.
             //Setup await interaction for the button and route to search global.
         }else{
-            const row = new MessageActionRow() 
+            const row = new ActionRowBuilder() 
             .addComponents(exitButton);
             await interaction.editReply({
                 embeds:[errorEmbed(`The server-wide search returned no results.`,initiatorAvatar)],
@@ -65,7 +66,7 @@ async function searchServer(
         };
 
         //Checking for the button responses, if any.
-        const buttonCollected = await interaction.channel.awaitMessageComponent({ filter: buttonFilter, componentType: 'BUTTON', time: 60000, max: 1 })
+        const buttonCollected = await interaction.channel.awaitMessageComponent({ filter: buttonFilter, ComponentType: ComponentType.Button, time: 60000, max: 1 })
         .catch(e => {});
 
         if(!buttonCollected){

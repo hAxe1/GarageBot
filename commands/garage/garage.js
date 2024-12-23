@@ -1,4 +1,4 @@
-const { MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { obtainGuildProfile, defaultEmbedColor, obtainAllUserVehicles, obtainUserProfile } = require('../../modules/database.js');
 const {  errorEmbed, removeNonIntegers, tipsEmbed, patreonAdvertEmbed } = require('../../modules/utility.js');
@@ -85,7 +85,7 @@ module.exports = {
 			};
 		});
 
-		const garageEmbed = new MessageEmbed()
+		const garageEmbed = new EmbedBuilder()
 		.setAuthor({
 			name: `${userTag}'s Garage`,
 			iconURL: userAvatar
@@ -133,7 +133,7 @@ module.exports = {
 				});
 				return;
 			};
-			const vehicleEmbed = new MessageEmbed()
+			const vehicleEmbed = new EmbedBuilder()
 			.setAuthor({
 				name: `${vehicleName} - Driven By ${userTag}`,
 				iconURL: userAvatar
@@ -146,16 +146,16 @@ module.exports = {
 			})
 			if(vehicleDescription) vehicleEmbed.setDescription(vehicleDescription);
 			let componentsArray = [];
-			const row = new MessageActionRow() 
-			const previousButton = new MessageButton()
+			const row = new ActionRowBuilder() 
+			const previousButton = new ButtonBuilder()
 			.setCustomId(`previousVehicleImage+${mainInteractionId}`)
 			.setLabel('Previous')
-			.setStyle('PRIMARY')
+			.setStyle('Primary')
 			.setDisabled(true);
-			const nextButton = new MessageButton()
+			const nextButton = new ButtonBuilder()
 			.setCustomId(`nextVehicleImage+${mainInteractionId}`)
 			.setLabel('Next')
-			.setStyle('PRIMARY');
+			.setStyle('Primary');
 			if(vehicleImages.length > 1){
 				row.addComponents(previousButton).addComponents(nextButton);
 				componentsArray = [row];
@@ -199,7 +199,7 @@ module.exports = {
 								if (page >= pages.length){
 									nextButton.setDisabled(true);
 								};
-								const row = new MessageActionRow() 
+								const row = new ActionRowBuilder() 
 								row.addComponents(previousButton).addComponents(nextButton);
 								await interaction.editReply({
 									embeds: [vehicleEmbed],
@@ -223,7 +223,7 @@ module.exports = {
 								if (page <= 1){
 									previousButton.setDisabled(true);
 								};
-								const row = new MessageActionRow() 
+								const row = new ActionRowBuilder() 
 								row.addComponents(previousButton).addComponents(nextButton);
 								await interaction.editReply({
 									embeds: [vehicleEmbed],
