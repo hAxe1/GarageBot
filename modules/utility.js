@@ -98,7 +98,7 @@ function patreonAdvertEmbed(avatar, title, description, footerIcon, footerText){
     .addComponents(
         new ButtonBuilder()
             .setLabel('Patreon')
-            .setStyle('Links')
+            .setStyle('Link')
             .setURL(patreonLink)
     );
     return {
