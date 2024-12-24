@@ -11,14 +11,8 @@ const client = new Client({
                 GatewayIntentBits.GuildEmojisAndStickers,
                 GatewayIntentBits.GuildMembers,
                 GatewayIntentBits.MessageContent
-        ],
-        presence: {
-                status: 'online',
-                activities: [{
-                        name: '/help | Stop verifying your dad\'s BMW.',
-                        type: 'PLAYING',
-                }]
-        }
+        ]
+
         });
 
 //Command Handler Collection
