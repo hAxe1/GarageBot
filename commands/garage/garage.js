@@ -165,6 +165,7 @@ module.exports = {
 				components: componentsArray
 			});
 
+			/*
 			const patreonAd = patreonAdvertEmbed(initiatorAvatar, 'Join the Patreon!', 'Enhance your vehicles with more images and detailed descriptions. Enjoy an exclusive supporter role, with permanent access to these perks!', footerIcon, "ThrottleBot Verification Patreon")
 			if(!premiumUser){
 				if(chance.bool({ likelihood: 30 })){
@@ -175,6 +176,7 @@ module.exports = {
 					});
 				};
 			};
+			*/
 			//Button collector to manage the multiple images if it exists.
 			if(vehicleImages.length > 1){
 				let pages = vehicleImages;
